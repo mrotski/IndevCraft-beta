@@ -8,6 +8,7 @@ import { Controls } from "./player/Controls.js";
 import { Player } from "./player/Player.js";
 import { Chat } from "./ui/Chat.js";
 import { HUD } from "./ui/HUD.js";
+import { PauseMenu } from "./ui/PauseMenu.js";
 
 export async function startGame() {
   const canvas = document.getElementById("gameCanvas");
@@ -53,6 +54,22 @@ export async function startGame() {
   chunkManager.queueNearbyChunks(savedChunk.cx, savedChunk.cz);
   chunkManager.generatePending(25);
   chunkManager.rebuildDirtyMeshes(25);
+
+  const pauseMenu = new PauseMenu({
+    saveManager,
+    onBack() {
+      // keep the game responsive after closing the menu; user can click to regain pointer lock.
+    },
+    onSave(name) {
+      saveWorld();
+      return saveManager.saveNamed(name);
+    },
+    onLoad(name) {
+      saveWorld();
+      if (!saveManager.loadNamed(name)) return;
+      window.location.reload();
+    },
+  });
 
   const controls = new Controls(canvas);
   const hasValidSavedPosition =
@@ -113,6 +130,11 @@ export async function startGame() {
       return;
     }
     if (chat.isOpen()) return;
+    if (event.code === "Escape") {
+      event.preventDefault();
+      pauseMenu.toggle();
+      return;
+    }
     if (event.code === "KeyF") saveWorld();
     if (event.code === "KeyR") {
       player.position.copyFrom(chunkManager.findSpawn());
