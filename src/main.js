@@ -58,7 +58,9 @@ export async function startGame() {
   const pauseMenu = new PauseMenu({
     saveManager,
     onBack() {
-      // keep the game responsive after closing the menu; user can click to regain pointer lock.
+      if (!document.pointerLockElement) {
+        canvas.requestPointerLock();
+      }
     },
     onSave(name) {
       saveWorld();
@@ -72,6 +74,14 @@ export async function startGame() {
   });
 
   const controls = new Controls(canvas);
+  let lastPointerLocked = document.pointerLockElement === canvas;
+  document.addEventListener("pointerlockchange", () => {
+    const nowLocked = document.pointerLockElement === canvas;
+    if (lastPointerLocked && !nowLocked && !pauseMenu.isOpen() && !chat.isOpen()) {
+      pauseMenu.show();
+    }
+    lastPointerLocked = nowLocked;
+  });
   const hasValidSavedPosition =
     savedPlayer &&
     savedPlayer.position.length === 3 &&
