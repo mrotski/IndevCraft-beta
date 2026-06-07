@@ -118,7 +118,7 @@ export async function startGame() {
     }
   });
 
-  document.addEventListener("keydown", (event) => {
+  window.addEventListener("keydown", (event) => {
     if (event.code === "F1") {
       event.preventDefault();
       hud.toggleHidden();

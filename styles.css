@@ -176,6 +176,7 @@ body {
   background: rgba(0, 0, 0, 0.45);
   pointer-events: auto;
   text-shadow: 2px 2px 0 #1b1b1b;
+  z-index: 999;
 }
 
 #pauseMenu.open {
