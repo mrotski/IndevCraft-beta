@@ -129,6 +129,24 @@ export async function startGame() {
   });
 
   window.addEventListener("keydown", (event) => {
+    if (event.code === "Escape") {
+      if (chat.isOpen()) {
+        event.preventDefault();
+        chat.hide();
+        return;
+      }
+      if (pauseMenu.isOpen()) {
+        event.preventDefault();
+        pauseMenu.hide();
+        return;
+      }
+      event.preventDefault();
+      pauseMenu.show();
+      return;
+    }
+
+    if (pauseMenu.isOpen() || chat.isOpen()) return;
+
     if (event.code === "F1") {
       event.preventDefault();
       hud.toggleHidden();
@@ -139,14 +157,12 @@ export async function startGame() {
       hud.toggleDebugGui();
       return;
     }
-    if (chat.isOpen()) return;
-    if (event.code === "Escape") {
-      event.preventDefault();
-      pauseMenu.toggle();
+    if (event.code === "KeyF") {
+      saveWorld();
       return;
     }
-    if (event.code === "KeyF") saveWorld();
     if (event.code === "KeyR") {
+      event.preventDefault();
       player.position.copyFrom(chunkManager.findSpawn());
       player.velocity.set(0, 0, 0);
       saveWorld();
